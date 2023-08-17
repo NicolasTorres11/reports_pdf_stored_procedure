@@ -22,7 +22,7 @@ def execute_procedure(connection_string, procedure_name, option):
     cursor = connection.cursor()
 
     cursor.execute(
-        f'EXEC {procedure_name} @usuarioID=22, @rolID=7, @opcion={option}, @Categoria=1, @resultado=0'
+        f'EXEC {procedure_name} @usuarioID=22, @rolID=7, @opcion={option}, @Categoria=2, @resultado=0'
     )
 
     result = cursor.fetchall()
@@ -80,7 +80,8 @@ def create_pdf(data, out_pdf, pdf_title, logo_image):
     story.append(Spacer(1,  0.5 * inch))
 
     for option, title_procedure in options:
-        data = execute_procedure(connection_string, procedure_name, option)
+        data = execute_procedure(
+            connection_string, procedure_name, option)
         table_data = {
             'title': f' {title_procedure}',
             'header': ['Número de Vehículo', 'Placa del Vehículo', 'Número de Documento', 'Fecha Vencimiento'],
