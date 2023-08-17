@@ -9,7 +9,7 @@ smtp_port = 465
 smtp_username = 'asistemas@berlinasdelfonce.com'
 smtp_password = 'NUEVO*2023'
 sender_mail = 'asistemas@berlinasdelfonce.com'
-receiver_mail = 'asistemas@berlinasdelfonce.com'
+receiver_mail = 'sistemas@berlinasdelfonce.com'
 subject = 'BERLINAS DEL FONCE S.A. --> Informe de Vencimientos de SOAT, RTM y Tarjetas de Operación'
 
 dia_registro = datetime.datetime.now()
@@ -36,7 +36,7 @@ body = f"""
         Oficina Principal: Cra 68D No. 15 - 15<br/>
         Bogota-Colombia<br/>
         """
-msg.attach(MIMEText(body, "plain"))
+msg.attach(MIMEText(body, "html"))
 
 pdf_filename = 'vencimientosBarranquilla.pdf'
 

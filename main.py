@@ -15,6 +15,7 @@ from reportlab.platypus import (
     Frame
 )
 from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.pdfgen import canvas
 
 
 def execute_procedure(connection_string, procedure_name, option):
@@ -22,7 +23,7 @@ def execute_procedure(connection_string, procedure_name, option):
     cursor = connection.cursor()
 
     cursor.execute(
-        f'EXEC {procedure_name} @usuarioID=22, @rolID=7, @opcion={option}, @Categoria=2, @resultado=0'
+        f'EXEC {procedure_name} @usuarioID=22, @rolID=7, @opcion={option}, @Categoria=1, @resultado=0'
     )
 
     result = cursor.fetchall()
@@ -35,7 +36,7 @@ def execute_procedure(connection_string, procedure_name, option):
 
 pdf_title = 'Vencimientos Vehiculos'
 out_pdf = 'vencimientosBarranquilla.pdf'
-pdf_image = 'logo.png'
+pdf_image = 'Berlinas.png'
 connection_string = 'Driver={ODBC Driver 17 for SQL Server};Server=172.16.0.25;Database=Gestor;UID=developer;PWD=123456'
 procedure_name = 'TP_obtenerVencimientos2'
 
@@ -72,9 +73,6 @@ def create_pdf(data, out_pdf, pdf_title, logo_image):
     story = []
     styles = getSampleStyleSheet()
 
-    logo = Image(logo_image, width=1.5 * inch, height=1.5 * inch)
-    story.append(logo)
-
     title = Paragraph(f'<b>{pdf_title}</b>', styles['Title'])
     story.append(title)
     story.append(Spacer(1,  0.5 * inch))
@@ -109,6 +107,10 @@ def create_pdf(data, out_pdf, pdf_title, logo_image):
             ('GRID', (0, 0), (-1, -1), 1, colors.black),
         ]))
 
+        c = canvas.Canvas(out_pdf, pagesize=landscape(letter))
+        logo = Image(logo_image, width=1.5 * inch, height=1.5 * inch)
+        # Dibujar la imagen en la esquina superior izquierda del lienzo
+        logo.drawOn(c, inch, doc.height + doc.topMargin - 1.5 * inch)
         story.append(table)
         story.append(Spacer(1, 0.2 * inch))
 
@@ -118,6 +120,7 @@ def create_pdf(data, out_pdf, pdf_title, logo_image):
         story.append(footer)
 
         story.append(PageBreak())
+        c.save()
 
     doc.build(story)
 
