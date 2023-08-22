@@ -18,12 +18,12 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.pdfgen import canvas
 
 
-def execute_procedure(connection_string, procedure_name, option):
+def execute_procedure(connection_string, procedure_name, option, category):
     connection = pyodbc.connect(connection_string)
     cursor = connection.cursor()
 
     cursor.execute(
-        f'EXEC {procedure_name} @usuarioID=22, @rolID=7, @opcion={option}, @Categoria=1, @resultado=0'
+        f'EXEC {procedure_name} @usuarioID=22, @rolID=7, @opcion={option}, @Categoria={category}, @resultado=0'
     )
 
     result = cursor.fetchall()
@@ -46,7 +46,12 @@ options = [
     (3, 'SOAT VENCIDOS'),
     (4, 'SOAT POR VENCER'),
     (5, 'RTM VENCIDOS'),
-    (6, 'RTM VENCIDOS')
+    (6, 'RTM POR VENCER')
+]
+
+category = [
+    (1, 'vencimientosBogota.pdf'),
+    (2, 'vencimientosBarranquilla.pdf')
 ]
 
 
@@ -68,21 +73,34 @@ class MyDocTemplate(SimpleDocTemplate):
         super().after_page()
 
 
-def create_pdf(data, out_pdf, pdf_title, logo_image):
+def create_pdf(data, category_number, pdf_title, logo_image):
+    category_name = None
+    for num, name in category:
+        if num == category_number:
+            category_name = name
+            break
+    if category_name is None:
+        raise ValueError(
+            f"Categoría {category_number} no encontrada en la lista")
+
+    out_pdf = category_name
     doc = MyDocTemplate(out_pdf, pagesize=landscape(letter))
     story = []
     styles = getSampleStyleSheet()
-
+    styles['Title'].fontName = 'Times-Bold'
+    styles['Normal'].textColor = colors.white
+    styles['Normal'].fontName = 'Times-Bold'
+    styles['Heading2'].fontName = 'Times-Bold'
     title = Paragraph(f'<b>{pdf_title}</b>', styles['Title'])
     story.append(title)
     story.append(Spacer(1,  0.5 * inch))
 
     for option, title_procedure in options:
         data = execute_procedure(
-            connection_string, procedure_name, option)
+            connection_string, procedure_name, option, category_number)
         table_data = {
             'title': f' {title_procedure}',
-            'header': ['Número de Vehículo', 'Placa del Vehículo', 'Número de Documento', 'Fecha Vencimiento'],
+            'header': ['Empresa', 'Número de Vehículo', 'Placa del Vehículo', 'Número de Documento', 'Fecha Vencimiento'],
             'data': data
         }
 
@@ -98,12 +116,12 @@ def create_pdf(data, out_pdf, pdf_title, logo_image):
 
         table = Table([header_paragraphs] + table_content)
         table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.white),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
             ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.black),
             ('GRID', (0, 0), (-1, -1), 1, colors.black),
         ]))
 
@@ -126,5 +144,6 @@ def create_pdf(data, out_pdf, pdf_title, logo_image):
 
 
 if __name__ == '__main__':
-    create_pdf(None, out_pdf, pdf_title, pdf_image)
+    for category_num, _ in category:
+        create_pdf(None, category_num, pdf_title, pdf_image)
     print(f'PDF GENERADO SIN ERRORES')
