@@ -1,16 +1,13 @@
 @echo off
 
 rem Cambia al directorio del proyecto
-cd C:\Users\stecnico\PycharmProjects\correos_vencimientos
+cd C:\Users\stecnico\Documents\GitHub\reports_pdf_stored_procedure
 
 rem Activa el entorno virtual
 call venv\Scripts\activate.bat
 
-rem Cambia al directorio del script
-cd Barranquilla
-
 rem Ejecuta el script de Python
-python vencimientos_barranquilla.py
+python main.py
 
 rem Desactiva el entorno virtual
 deactivate

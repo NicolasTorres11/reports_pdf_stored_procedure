@@ -9,7 +9,7 @@ smtp_port = 465
 smtp_username = 'asistemas@berlinasdelfonce.com'
 smtp_password = 'NUEVO*2023'
 sender_mail = 'asistemas@berlinasdelfonce.com'
-receiver_mail = 'tramitesvehiculos@berlinasdelfonce.com'
+receiver_mail = 'asistemas@berlinasdelfonce.com'
 subject = 'BERLINAS DEL FONCE S.A. --> Informe de Vencimientos de SOAT, RTM y Tarjetas de Operación'
 
 dia_registro = datetime.datetime.now()
@@ -20,7 +20,7 @@ msg['To'] = receiver_mail
 msg['Subject'] = subject
 
 body = f"""
-        <p>INFORME DE VENCIMIENTOS DE SOAT, RTM Y LAS TARJETAS DE OPERACION EN LOS VEHICULOS DE BARRANQUILLA</p>
+        <p>INFORME DE VENCIMIENTOS DE SOAT, RTM Y LAS TARJETAS DE OPERACION EN LOS VEHICULOS DE BOGOTA</p>
         <br/>
         Adjunto al presente estamos enviando el detalle del Informe de Vencimientos de SOAT, RTM y Tarjetas de Operación:<br/>
         <br/>
@@ -38,7 +38,7 @@ body = f"""
         """
 msg.attach(MIMEText(body, "html"))
 
-pdf_filename = 'vencimientosBarranquilla.pdf'
+pdf_filename = 'vencimientosBogota.pdf'
 
 with open(pdf_filename, 'rb') as pdf_file:
     pdf_attachment = MIMEApplication(pdf_file.read(), _subtype='pdf')

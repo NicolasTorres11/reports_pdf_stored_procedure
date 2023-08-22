@@ -35,7 +35,7 @@ def execute_procedure(connection_string, procedure_name, option):
 
 
 pdf_title = 'Vencimientos Vehiculos'
-out_pdf = 'vencimientosBarranquilla.pdf'
+out_pdf = 'vencimientosBogota.pdf'
 pdf_image = 'Berlinas.png'
 connection_string = 'Driver={ODBC Driver 17 for SQL Server};Server=172.16.0.25;Database=Gestor;UID=developer;PWD=123456'
 procedure_name = 'TP_obtenerVencimientos2'
