@@ -62,7 +62,7 @@ data = [
     ('vencimientosBarranquilla.pdf', 'BARRANQUILLA', [
      'asistemas@berlinasdelfonce.com', 'penatorresnicolas@gmail.com']),
     ('vencimientosBogota.pdf', 'BOGOTA', [
-     'sistemas@berlinasdelfonce.com', 'penatorresnicolas@gmail.com'])
+     'asistemas@berlinasdelfonce.com', 'penatorresnicolas@gmail.com'])
 ]
 
 for pdf_file, city, recipient_email in data:

@@ -1,7 +1,7 @@
 @echo off
 
 rem Ruta del programa
-set "program_path=C:\Users\stecnico\Documents\GitHub\reports_pdf_stored_procedure"
+set "program_path=C:\Users\stecnico\Documents\GitHub\reports_pdf_stored_procedure\proc_mon"
 
 rem Activa el entorno virtual (ajusta el nombre del entorno si es diferente)
 call %program_path%\venv\Scripts\activate

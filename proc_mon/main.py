@@ -17,6 +17,8 @@ from reportlab.platypus import (
 from reportlab.lib.styles import getSampleStyleSheet
 
 
+# FUNCION PARA LLAMAR EL PROCEDIMIENTO DE ALAMCENADO
+# TRAEREMOS LA CONEXION A LA BD, EL NOMBRE DEL PROCEDIMIENTO, LA OPCION DEL PROCEDIMIENTO, Y LA CATEGORIA, LOS CUALES SON PARAMETROS
 def execute_procedure(connection_string, procedure_name, option, category):
     connection = pyodbc.connect(connection_string)
     cursor = connection.cursor()
@@ -33,12 +35,17 @@ def execute_procedure(connection_string, procedure_name, option, category):
     return result
 
 
+# TITULO DEL PDF
 pdf_title = 'Vencimientos Vehiculos'
-out_pdf = 'vencimientosBogota.pdf'
-pdf_image = 'logo.png'
+
+# Imagen y logo
+pdf_image = 'Berlinas.png'
+# CONNECION A LA BD
 connection_string = 'Driver={ODBC Driver 17 for SQL Server};Server=172.16.0.25;Database=Gestor;UID=developer;PWD=123456'
+# NOMBRE DEL PROCEDIMIENTO
 procedure_name = 'TP_obtenerVencimientos2'
 
+# OPCIONES DEL PROCEDIMIENTO
 options = [
     (1, 'TARJETAS DE OPERACION VENCIDAS'),
     (2, 'TARJETAS DE OPERACION POR VENCER'),
@@ -48,12 +55,14 @@ options = [
     (6, 'RTM POR VENCER')
 ]
 
+# CATEGORIAS(CIUDADES) Y NOMBRES DEL PDF
 category = [
     (1, 'vencimientosBogota.pdf'),
     (2, 'vencimientosBarranquilla.pdf')
 ]
 
 
+# TEMPLATE DEL PDF
 class MyDocTemplate(SimpleDocTemplate):
     def __init__(self, filename, **kwargs):
         super().__init__(filename, **kwargs)
@@ -72,7 +81,15 @@ class MyDocTemplate(SimpleDocTemplate):
         super().after_page()
 
 
+# FUNCION PARA LA CREACION DEL PDF
+# TENDREMOS COMO PARAMETROS, DATA -> QUE SERA LA INFORMACION QUE CONTENDRA EL PDF, ESTA VENDRA DEL PROCEDIMIENTO
+# CATEGORY_NUMBER -> A ESTE LE PASAREMOS LA TUPLA DE CATEGORY PARA CONTROLAR LAS CIUDADES DEL PROCEDIMIENTO
+# PDF_TITLE -> EL TITULO DE NUESTRO PDF
+# PDF_IMAGE -> IMAGEN DEL PDF
 def create_pdf(data, category_number, pdf_title, logo_image):
+
+    # recorrer la categoria y segun el numero generar el nombre del pdf
+    # ademas de devolvernos el numero de la categoria para pasarlo al procedimiento
     category_name = None
     for num, name in category:
         if num == category_number:
@@ -82,7 +99,9 @@ def create_pdf(data, category_number, pdf_title, logo_image):
         raise ValueError(
             f"Categoría {category_number} no encontrada en la lista")
 
+    # este out_pdf traera el nombre del pdf
     out_pdf = category_name
+    # generaremos los estilos iniciales del pdf
     doc = MyDocTemplate(out_pdf, pagesize=landscape(letter))
     story = []
     styles = getSampleStyleSheet()
@@ -101,17 +120,25 @@ def create_pdf(data, category_number, pdf_title, logo_image):
     story.append(title)
     story.append(Spacer(1,  0.5 * inch))
 
+    # Esta sera el for para recorrer los datos del procedimiento de almacenado
+    # el cual tendra el titulo del procedimiento y las opciones
     for option, title_procedure in options:
+        # llamaremos al procedimiento y la pasaremos los datos
+        # recorreremos la lista de options y category_number
         data = execute_procedure(
             connection_string, procedure_name, option, category_number)
         table_data = {
-            'title': f' {title_procedure}',
+            'title': f' {title_procedure}',  # titulo del procedimiento
+            # headers del procedimiento
             'header': ['Empresa', 'Número de Vehículo', 'Placa del Vehículo', 'Número de Documento', 'Fecha Vencimiento'],
-            'data': data
+            'data': data  # informacion que le pasaremos al procedimiento
         }
 
+        # Titulo de la tabla
         table_title = table_data['title']
+        # header de la tabla
         table_header = table_data['header']
+        # datos de la tabla
         table_content = [list(row)for row in table_data['data']]
 
         table_title_paragraph = Paragraph(table_title, styles['Heading2'])
@@ -133,6 +160,7 @@ def create_pdf(data, category_number, pdf_title, logo_image):
         story.append(table)
         story.append(Spacer(1, 0.2 * inch))
 
+        # footer de la tabla con la fecha y hora de generacion
         now = datetime.datetime.now()
         footer_text = f'Documento Generado el {now:%Y-%m-%d %H:%M:%S}'
         footer = Paragraph(footer_text, styles['Normal'])
